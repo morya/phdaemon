@@ -18,13 +18,15 @@ import (
 )
 
 var (
-	flagSleep = flag.Int("sleep", 10, "sleep second")
-    flagAlertUrl = flag.String("alertUrl", "https://sc.ftqq.com/SCU20246T6f4f873407163ae0f49ca8ca8788c3385b40c18a19d6f.send", "")
+	flagSleep    = flag.Int("sleep", 10, "sleep second")
+	flagAlertUrl = flag.String("alertUrl", "https://sc.ftqq.com/SCU20246T6f4f873407163ae0f49ca8ca8788c3385b40c18a19d6f.send", "")
 )
 
 type Sys struct {
-	wg   *sync.WaitGroup
-	stop chan int
+	cpuAlertCount int
+	memAlertCount int
+	wg            *sync.WaitGroup
+	stop          chan int
 }
 
 func NewSys() *Sys {
@@ -34,22 +36,34 @@ func NewSys() *Sys {
 	}
 }
 
-func (*Sys) checkMem() {
+func (ss *Sys) checkMem() {
 	v, _ := mem.VirtualMemory()
 	s := fmt.Sprintf("mem used percent:%.2f%%", v.UsedPercent)
 	log.Info(s)
 	if v.UsedPercent > 25 {
-		fangtangNotify("mem alert", s)
+		ss.memAlertCount++
+		if ss.memAlertCount > 3 {
+			fangtangNotify("mem alert", s)
+			ss.memAlertCount = 0
+		}
+	} else {
+		ss.memAlertCount = 0
 	}
 }
 
-func (*Sys) checkCpu() {
+func (ss *Sys) checkCpu() {
 	v, _ := cpu.Percent(time.Millisecond*300, false)
 	f := v[0]
 	s := fmt.Sprintf("cpu used percent:%.2f%%", f)
 	log.Info(s)
 	if f > 20 {
-		fangtangNotify("cpu alert", s)
+		ss.cpuAlertCount++
+		if ss.cpuAlertCount > 3 {
+			fangtangNotify("cpu alert", s)
+			ss.cpuAlertCount = 0
+		}
+	} else {
+		ss.cpuAlertCount = 0
 	}
 }
 
