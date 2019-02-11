@@ -1,0 +1,8 @@
+github.com/morya/utils v1.2.0 h1:1ccbsgPQ6S6+hCwItMxBnqX04gxMOfdHNfY5fEbpO8A=
+github.com/morya/utils v1.2.0/go.mod h1:LbzaNLtKq8BOjqsn3C1efGBX0SthExmBHTxxyGc5xr8=
+github.com/shirou/gopsutil v2.18.11+incompatible h1:PMFTKnFTr/YTRW5rbLK4vWALV3a+IGXse5nvhSjztmg=
+github.com/shirou/gopsutil v2.18.11+incompatible/go.mod h1:5b4v6he4MtMOwMlS0TUMTu2PcXUg8+E1lC7eC3UO/RA=
+golang.org/x/sys v0.0.0-20181228144115-9a3f9b0469bb h1:pf3XwC90UUdNPYWZdFjhGBE7DUFuK3Ct1zWmZ65QN30=
+golang.org/x/sys v0.0.0-20181228144115-9a3f9b0469bb/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+gopkg.in/ini.v1 v1.40.0 h1:JOoHKRa3vZxx47SL6sOY0gj0hfmA24l+BkQ4CftFizc=
+gopkg.in/ini.v1 v1.40.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
