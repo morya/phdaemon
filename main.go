@@ -18,12 +18,12 @@ import (
 )
 
 const (
-    DINGDING_ROBOT_URL = "https://oapi.dingtalk.com/robot/send?access_token=507969ee1c6f5d9aee540a9a14047c732385521156029971199c0a83a60722fb"
+	DINGDING_ROBOT_URL = "https://oapi.dingtalk.com/robot/send?access_token=507969ee1c6f5d9aee540a9a14047c732385521156029971199c0a83a60722fb"
 )
 
 var (
 	flagSleep    = flag.Int("sleep", 10, "sleep second")
-    flagAlertUrl = flag.String("alertUrl", DINGDING_ROBOT_URL, "")
+	flagAlertUrl = flag.String("alertUrl", DINGDING_ROBOT_URL, "")
 )
 
 type Sys struct {
