@@ -17,9 +17,13 @@ import (
 	"github.com/shirou/gopsutil/process"
 )
 
+const (
+    DINGDING_ROBOT_URL = "https://oapi.dingtalk.com/robot/send?access_token=507969ee1c6f5d9aee540a9a14047c732385521156029971199c0a83a60722fb"
+)
+
 var (
 	flagSleep    = flag.Int("sleep", 10, "sleep second")
-	flagAlertUrl = flag.String("alertUrl", "https://sc.ftqq.com/SCU20246T6f4f873407163ae0f49ca8ca8788c3385b40c18a19d6f.send", "")
+    flagAlertUrl = flag.String("alertUrl", DINGDING_ROBOT_URL, "")
 )
 
 type Sys struct {
@@ -40,10 +44,10 @@ func (ss *Sys) checkMem() {
 	v, _ := mem.VirtualMemory()
 	s := fmt.Sprintf("mem used percent:%.2f%%", v.UsedPercent)
 	log.Info(s)
-	if v.UsedPercent > 25 {
+	if v.UsedPercent > 75 {
 		ss.memAlertCount++
 		if ss.memAlertCount > 3 {
-			fangtangNotify("mem alert", s)
+			sendAlert("mem alert", s)
 			ss.memAlertCount = 0
 		}
 	} else {
@@ -59,7 +63,7 @@ func (ss *Sys) checkCpu() {
 	if f > 20 {
 		ss.cpuAlertCount++
 		if ss.cpuAlertCount > 3 {
-			fangtangNotify("cpu alert", s)
+			sendAlert("cpu alert", s)
 			ss.cpuAlertCount = 0
 		}
 	} else {
