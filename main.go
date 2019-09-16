@@ -109,6 +109,7 @@ func (s *Sys) checkOraynewph(processes []*process.Process) {
 
 func (s *Sys) Stop() {
 	timeout := time.NewTicker(time.Millisecond * 50)
+	defer timeout.Stop()
 	select {
 	case s.stop <- 1:
 	case <-timeout.C:
@@ -121,6 +122,7 @@ func (s *Sys) Run() {
 	s.wg.Add(1)
 	defer s.wg.Done()
 	ticker := time.NewTicker(time.Duration(*flagSleep) * time.Second)
+	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
