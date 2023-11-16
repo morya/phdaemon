@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/url"
-    "encoding/json"
 	"time"
-    "bytes"
 
-	"github.com/morya/utils/log"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -16,19 +16,17 @@ const (
 
 type H map[string]interface{}
 
-
 func getTimeStamp() string {
 	t := time.Now().Format(TIME_FORMAT)
 	return t
 }
 
 func DumpObject(obj interface{}) []byte {
-     buff := &bytes.Buffer{}
-     enc := json.NewEncoder(buff)
-     enc.Encode(obj)
-     return buff.Bytes()
+	buff := &bytes.Buffer{}
+	enc := json.NewEncoder(buff)
+	enc.Encode(obj)
+	return buff.Bytes()
 }
-
 
 var lastAlert time.Time
 
@@ -43,10 +41,10 @@ func fangtangNotify(title, content string) {
 
 	c := new(http.Client)
 
-	log.Debugf("ftqq url = %v", ftqqURL)
+	logrus.Debugf("ftqq url = %v", ftqqURL)
 	resp, err := c.PostForm(ftqqURL, postData)
 	if err != nil {
-		log.ErrorError(err, "call FTQQ http api failed")
+		logrus.ErrorError(err, "call FTQQ http api failed")
 		return
 	}
 	resp.Body.Close()
@@ -58,32 +56,32 @@ func couldAlert() bool {
 		return false
 	}
 	lastAlert = now
-    return true
+	return true
 }
 
 func dingtalkNotify(title, content string) error {
-    alertUrl := *flagAlertUrl
-    log.Debugf("dingtalk alert url = %v", alertUrl)
+	alertUrl := *flagAlertUrl
+	logrus.Debugf("dingtalk alert url = %v", alertUrl)
 
-    ts := getTimeStamp()
+	ts := getTimeStamp()
 
-    var data = H{}
-    data["msgtype"] = "text"
-    data["text"] = H{"content": ts + content}
-    bindata := bytes.NewReader(DumpObject(data))
+	var data = H{}
+	data["msgtype"] = "text"
+	data["text"] = H{"content": ts + content}
+	bindata := bytes.NewReader(DumpObject(data))
 
-    c := new(http.Client)
-    resp, err := c.Post(alertUrl, "application/json", bindata)
-    if err != nil {
-        return err
-    }
-    resp.Body.Close()
-    return nil
+	c := new(http.Client)
+	resp, err := c.Post(alertUrl, "application/json", bindata)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	return nil
 }
 
 func sendAlert(title, content string) {
-    if ! couldAlert() {
-        return
-    }
+	if !couldAlert() {
+		return
+	}
 	dingtalkNotify(title, content)
 }

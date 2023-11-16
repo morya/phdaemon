@@ -11,19 +11,20 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/morya/utils/log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
+	"github.com/sirupsen/logrus"
 )
 
 const (
-	DINGDING_ROBOT_URL = "https://oapi.dingtalk.com/robot/send?access_token=507969ee1c6f5d9aee540a9a14047c732385521156029971199c0a83a60722fb"
+	DINGDING_ROBOT_URL = ""
 )
 
 var (
 	flagSleep    = flag.Int("sleep", 10, "sleep second")
 	flagAlertUrl = flag.String("alertUrl", DINGDING_ROBOT_URL, "")
+	flagLogLevel = flag.String("logLevel", "info", "log level")
 )
 
 type Sys struct {
@@ -43,7 +44,7 @@ func NewSys() *Sys {
 func (ss *Sys) checkMem() {
 	v, _ := mem.VirtualMemory()
 	s := fmt.Sprintf("mem used percent:%.2f%%", v.UsedPercent)
-	log.Info(s)
+	logrus.Info(s)
 	if v.UsedPercent > 75 {
 		ss.memAlertCount++
 		if ss.memAlertCount > 3 {
@@ -59,7 +60,7 @@ func (ss *Sys) checkCpu() {
 	v, _ := cpu.Percent(time.Millisecond*300, false)
 	f := v[0]
 	s := fmt.Sprintf("cpu used percent:%.2f%%", f)
-	log.Info(s)
+	logrus.Info(s)
 	if f > 20 {
 		ss.cpuAlertCount++
 		if ss.cpuAlertCount > 3 {
@@ -86,24 +87,24 @@ func (s *Sys) FindProcess(processes []*process.Process, desc string) *process.Pr
 func (s *Sys) checkOraysl(processes []*process.Process) {
 	var ps = s.FindProcess(processes, "oraysl")
 	if ps == nil {
-		log.Info("will start oraysl")
+		logrus.Info("will start oraysl")
 		var args = strings.Split("-a 127.0.0.1 -p 16062 -s phsle01.oray.net:6061 -l /var/log/phddns -L oraysl -d", " ")
 		cmd := exec.Command("/usr/orayapp/oraysl", args...)
 		cmd.Start()
 	} else {
-		log.Infof("oraysl pid = %v", ps.Pid)
+		logrus.Infof("oraysl pid = %v", ps.Pid)
 	}
 }
 
 func (s *Sys) checkOraynewph(processes []*process.Process) {
 	var ps = s.FindProcess(processes, "oraynewph")
 	if ps == nil {
-		log.Info("will start oraynewph")
+		logrus.Info("will start oraynewph")
 		var args = strings.Split("-s 0.0.0.0  -c /var/log/phddns/core.log -p /var/log/phddns -l oraynewph", " ")
 		cmd := exec.Command("/usr/orayapp/oraynewph", args...)
 		cmd.Start()
 	} else {
-		log.Infof("oraynewph pid = %v", ps.Pid)
+		logrus.Infof("oraynewph pid = %v", ps.Pid)
 	}
 }
 
@@ -145,8 +146,11 @@ func (s *Sys) Run() {
 func main() {
 	flag.Parse()
 
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.Info("started")
+	l, _ := logrus.ParseLevel(*flagLogLevel)
+	logrus.SetLevel(l)
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true, DisableQuote: true})
+
+	logrus.Info("started")
 
 	s := NewSys()
 	go s.Run()
